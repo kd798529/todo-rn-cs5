@@ -13,7 +13,8 @@ export default class App extends React.Component {
     super();
     this.state = {
       text: '',
-      todos: []
+      todos: [],
+      refresh: false
     };
   }
 
@@ -22,17 +23,29 @@ export default class App extends React.Component {
       let { text, todos } = prevState;
       return {
         text: '',
-        todos: [...todos, { key: text + todos.length, text /* completed */ }]
+        todos: [...todos, { key: text + todos.length, text, status: false }]
       };
     });
-    console.log(this.state.todos);
+    //console.log(this.state.todos);
   };
 
   handleTextChange = text => {
     this.setState({ text });
   };
 
+toggleStatus = (data) => {
+//console.log('data', data);
+this.setState({refresh: true});
+  data.status = !data.status;
+this.setState({refresh: false});
+  console.log(data);
+}
+
   render() {
+    const statusCheck = this.state.status ? lineThrough:null;
+    //console.log('statusCheck', statusCheck, this.state.status);
+
+    
     return (
       <View style={container}>
         {this.state.todos.length === 0 ? (
@@ -45,13 +58,14 @@ export default class App extends React.Component {
           value={this.state.text}
           placeholder="Add Todo"
         />
-        <Button onPress={() => this.handleButtonPress()} title="Add Todo" />
+        <Button onPress={this.handleButtonPress} title="Add Todo" />
         <FlatList
           data={this.state.todos}
+          extraData = {this.state}
           renderItem={({ item, key }) => {
             return (
               <View key={item.key}>
-                <Text style={/* fill this in with a dynamic style*/ null}>
+                <Text style={item.status ? styles.lineThrough:null} onPress={() => this.toggleStatus(item)}>
                   {item.text}
                 </Text>
               </View>
@@ -73,6 +87,10 @@ const styles = StyleSheet.create({
   },
   textFont: {
     fontSize: 28
+  },
+  lineThrough: {
+    textDecorationLine: 'line-through',
+    color: 'red'
   }
 });
 
